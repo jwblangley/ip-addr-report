@@ -1,6 +1,8 @@
 # ip-addr-report
 Simple python script to report when the machine's public IP address is changed. Ideal for use with a home server where a public static IP address has not been obtained from the ISP.
 
+Recommended to use with `cron`
+
 ## Installation
 This repository uses python virtual environments
 
