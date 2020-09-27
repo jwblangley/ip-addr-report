@@ -30,3 +30,11 @@ When you are finished, to close the virtual environment
 ```bash
 deactivate
 ```
+
+## Configuration
+This repository uses `dotenv` to manage private configuration variables. Create a `.env` file in the root directory to utilise this.
+
+To use [Pushbullet](https://pushbullet.com) reporting, add your Pushbullet API key to the `.env` file:
+```
+PUSHBULLET_API_KEY=<your_key_here>
+```

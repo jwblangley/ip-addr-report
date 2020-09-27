@@ -1,6 +1,7 @@
 import os
 from requests import get
 from dotenv import load_dotenv
+from pushbullet import Pushbullet
 
 load_dotenv()
 
@@ -9,8 +10,14 @@ STORE_FILE = 'ip-address.txt'
 def getIp():
     return get('https://api.ipify.org').text
 
-def reportEmail(currIp):
-    print('sending email')
+def reportPushBullet(currIp):
+    apiKey= os.getenv('PUSHBULLET_API_KEY')
+    if apiKey is None:
+        print('Could not locate PUSHBULLET_API_KEY')
+        return
+
+    pb = Pushbullet(apiKey)
+    pb.push_note('Public IP address of your machine has changed', 'New public IP address: ' + currIp)
 
 
 def reportUpdate(currIp, *methods):
@@ -18,8 +25,8 @@ def reportUpdate(currIp, *methods):
     print('Reporting via: ' + ', '.join(methods))
 
     for method in methods:
-        if method == 'email':
-            reportEmail(currIp)
+        if method == 'pushbullet':
+            reportPushBullet(currIp)
         else:
             print('Unknown report method: \'' + method + '\'')
 
@@ -49,4 +56,4 @@ if __name__ == "__main__":
     store.write(getIp() + '\n')
 
     print('Reporting update')
-    reportUpdate(currIp, 'email')
+    reportUpdate(currIp, 'pushbullet')
