@@ -1,4 +1,8 @@
+import os
 from requests import get
+from dotenv import load_dotenv
+
+load_dotenv()
 
 STORE_FILE = 'ip-address.txt'
 
@@ -25,7 +29,7 @@ if __name__ == "__main__":
     store = open(STORE_FILE, 'a+')
     store.seek(0)
 
-    # Read existing and move cursor to end
+    # Read existing and move cursor to end. Trim trailing new line
     prevIps = store.read().split('\n')[:-1]
 
     currIp = getIp()
