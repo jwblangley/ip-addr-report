@@ -1,4 +1,6 @@
 import os
+import sys
+
 from requests import get
 from dotenv import load_dotenv
 from pushbullet import Pushbullet
@@ -16,8 +18,10 @@ def reportPushBullet(currIp):
         print('Could not locate PUSHBULLET_API_KEY')
         return
 
+    print('Pushing to Pushbullet...', end=' ')
     pb = Pushbullet(apiKey)
     pb.push_note('Public IP address of your machine has changed', 'New public IP address: ' + currIp)
+    print('DONE')
 
 
 def reportUpdate(currIp, *methods):
@@ -55,5 +59,8 @@ if __name__ == "__main__":
     print('Recording current public IP address')
     store.write(getIp() + '\n')
 
-    print('Reporting update')
-    reportUpdate(currIp, 'pushbullet')
+    if (len(sys.argv) <= 1):
+        print('No reporting methods specified')
+    else:
+        print('Reporting update')
+        reportUpdate(currIp, *sys.argv[1:])

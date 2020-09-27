@@ -1,5 +1,5 @@
 # ip-addr-report
-Simple python script to report when the machine's public IP address is changed
+Simple python script to report when the machine's public IP address is changed. Ideal for use with a home server where a public static IP address has not been obtained from the ISP.
 
 ## Installation
 This repository uses python virtual environments
@@ -38,3 +38,22 @@ To use [Pushbullet](https://pushbullet.com) reporting, add your Pushbullet API k
 ```
 PUSHBULLET_API_KEY=<your_key_here>
 ```
+
+## Running
+With the virtual environment activated run the following:
+```bash
+python reportIp.py <method1> <method2> <...>
+```
+
+e.g.1 To just show updates to the terminal screen
+```bash
+python reportIp.py
+```
+
+e.g.2 To send updates to the linked Pushbullet account
+```bash
+python reportIp.py pushbullet
+```
+
+Current supported methods:
+* `pushbullet`
