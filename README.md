@@ -57,5 +57,7 @@ e.g.2 To send updates to the linked Pushbullet account
 python reportIp.py pushbullet
 ```
 
-Current supported methods:
+You can also pass the `-u` flag, in which case the utility will report a confirmation to the specified methods even the IP address is unchanged
+
+#### Current supported methods:
 * `pushbullet`
