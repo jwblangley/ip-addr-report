@@ -14,7 +14,7 @@ def getIp():
     return get("https://api.ipify.org").text
 
 
-def reportPushBullet(currIp):
+def reportPushBullet(title, body):
     apiKey = os.getenv("PUSHBULLET_API_KEY")
     if apiKey is None:
         print("Could not locate PUSHBULLET_API_KEY")
@@ -22,25 +22,51 @@ def reportPushBullet(currIp):
 
     print("Pushing to Pushbullet...", end=" ")
     pb = Pushbullet(apiKey)
-    pb.push_note(
-        "Public IP address of your machine has changed",
-        "New public IP address: " + currIp,
-    )
+    pb.push_note(title, body)
     print("DONE")
 
 
-def reportUpdate(currIp, *methods):
+def report(title, body, *methods):
     methods = list(methods)
     print("Reporting via: " + ", ".join(methods))
 
     for method in methods:
         if method == "pushbullet":
-            reportPushBullet(currIp)
+            reportPushBullet(title, body)
         else:
             print("Unknown report method: '" + method + "'")
 
 
+def reportUpdate(currIp, *methods):
+    title = "Public IP address of your machine has changed"
+    body = "New public IP address: " + currIp
+
+    report(title, body, *methods)
+
+
+def reportUnchanged(currIp, *methods):
+    title = "Machine online"
+    body = "Public IP address unchanged: " + currIp
+
+    report(title, body, *methods)
+
+
+def recordIpInStore(store):
+    print("Recording current public IP address")
+    store.write(getIp() + "\n")
+
+
 if __name__ == "__main__":
+    # Handle args
+    flags = list(filter(lambda s: s.startswith("-"), sys.argv[1:]))
+    reportingMethods = list(filter(lambda s: not s.startswith("-"), sys.argv[1:]))
+
+    if len(reportingMethods) == 0:
+        print("No reporting methods specified")
+        exit(1)
+
+    reportIfUnchanged = "-u" in flags
+
     # Open file and create if it does not exist
     store = open(STORE_FILE, "a+")
     store.seek(0)
@@ -53,19 +79,20 @@ if __name__ == "__main__":
 
     if len(prevIps) == 0:
         print("No known previous public IP addresses")
+        recordIpInStore(store)
+        reportUpdate(currIp, *reportingMethods)
     else:
         lastIp = prevIps[-1]
         print("Last known public IP address: " + lastIp)
+
         if lastIp == currIp:
             print("Current public IP address matches last known public IP address")
-            print("Nothing to do  - exiting")
-            exit()
+            if reportIfUnchanged:
+                reportUnchanged(currIp, *reportingMethods)
+            else:
+                print("Nothing to do - exiting")
+        else:
+            recordIpInStore(store)
+            reportUpdate(currIp, *reportingMethods)
 
-    print("Recording current public IP address")
-    store.write(getIp() + "\n")
-
-    if len(sys.argv) <= 1:
-        print("No reporting methods specified")
-    else:
-        print("Reporting update")
-        reportUpdate(currIp, *sys.argv[1:])
+    store.close()
