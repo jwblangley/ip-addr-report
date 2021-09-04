@@ -12,17 +12,21 @@ STORE_FILE = "ip-address.txt"
 FAIL_TIME_INTERVAL = 5
 
 
-def getIp(block_until_success=False):
-    success = False
-    while not success:
+def getIp(attempts=1):
+    attempt = 0
+    while attempt < attempts:
+        attempt += 1
         try:
-            res = get("https://api.ipify.org").text
-            success = True
+            return get("https://api.ipify.org").text
         except ConnectionError:
-            print("Connection failed. Trying again in 5 seconds.")
-            sleep(FAIL_TIME_INTERVAL)
-
-    return res
+            if attempt < attempts:
+                print("Connection failed. Trying again in 5 seconds.")
+                sleep(FAIL_TIME_INTERVAL)
+            else:
+                print(
+                    f"Connection failed. Could not connect after {attempts} attempts."
+                )
+                sys.exit(1)
 
 
 def reportPushBullet(title, body):
