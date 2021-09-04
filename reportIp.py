@@ -1,17 +1,28 @@
 import os
 import sys
+from time import sleep
 
-from requests import get
+from requests import get, ConnectionError
 from dotenv import load_dotenv
 from pushbullet import Pushbullet
 
 load_dotenv()
 
 STORE_FILE = "ip-address.txt"
+FAIL_TIME_INTERVAL = 5
 
 
-def getIp():
-    return get("https://api.ipify.org").text
+def getIp(block_until_success=False):
+    success = False
+    while not success:
+        try:
+            res = get("https://api.ipify.org").text
+            success = True
+        except ConnectionError:
+            print("Connection failed. Trying again in 5 seconds.")
+            sleep(FAIL_TIME_INTERVAL)
+
+    return res
 
 
 def reportPushBullet(title, body):
