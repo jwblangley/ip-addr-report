@@ -89,7 +89,7 @@ if __name__ == "__main__":
     # Read existing and move cursor to end. Trim trailing new line
     prevIps = store.read().split("\n")[:-1]
 
-    currIp = getIp()
+    currIp = getIp(attempts=9e99)
     print("Current public IP address: " + currIp)
 
     if len(prevIps) == 0:
